@@ -4,7 +4,8 @@ const express = require("express");
 const app = express();
 const models = require("./models");
 // const Post = models.Post;
-const Comment = models.Comment;
+const Student = models.Student;
+const student_course = models.Student_course
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
@@ -14,7 +15,7 @@ app.post("/user", async (req, res) => {
   const data = req.body;
   console.log(data);
   try {
-    const userr = await Comment.create(data);
+    const userr = await student_course.create(data);
     console.log(userr);
     return res.json({ data });
   
