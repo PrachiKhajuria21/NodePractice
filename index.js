@@ -3,11 +3,8 @@
 const express = require("express");
 const app = express();
 const models = require("./models");
-// const Post = models.Post;
-// const UserData = models.UserData;
-// const student_course = models.Student_course
 const User = models.User;
-const UserDetails = models.UserDetails;
+const UserPosts = models.UserPost;
 const bodyParser = require("body-parser");
 const { sequelize } = require("./models");
 app.use(bodyParser.json());
@@ -15,18 +12,17 @@ app.use(bodyParser.json());
 //create
 app.post("/user", async (req, res) => {
   console.log(req.body);
+  
   try {
     const userr = await User.create(
       { ...req.body },
       {
         include: {
-          model: UserDetails,
-          as: "UserDetails",
+          model: UserPosts
         },
       }
     );
     console.log(userr);
-    // return res.json({ data });
   } catch (err) {
     console.log(err);
     res.send(err);
@@ -39,8 +35,8 @@ app.get("/user", async (req, res) => {
   const records = await User.findAll({
     include: [
       {
-        model: UserDetails,
-        as: "UserDetails",
+        model: UserPosts
+  
       },
     ],
   });
@@ -49,44 +45,43 @@ app.get("/user", async (req, res) => {
 });
 
 //update
-app.put("/userUpdate/:id", async (req, res) => {
+app.put("/userUpdate/:id/:childID", async (req, res) => {
   const id = req.params.id;
-  console.log("records", req.body);
-  const t = await sequelize.transaction();
-    const records = await User.update(req.body,{
+  const child_id = req.params.childID;
+  try{
+   await User.update(req.body,{
       where:{
           id:id
-      }},{transaction:t})
-      const recordsData = await UserDetails.update(req.body.UserDetails,{
+      }});
+
+      await UserPosts.update(req.body.UserPost,{
         where:{
-            userId:id
+            id:child_id
         }
     }
+   
   );
-  // console.log(data, "data");
-  // return data;
-  console.log(records);
-  console.log(recordsData);
+  }catch(error){
   
-
-
-
+    console.log("error")
+    res.send(error);
+  }
 });
 
 app.delete("/user/:id", async (req, res) => {
   const id = req.params.id;
-  const records = await User.destroy({
+  console.log("id",id)
+
+  await User.destroy({
     where: {
       id:id
     },
-    cascade: true,
     include:[{
-      model:UserDetails,
-      as:UserDetails,
-     
+      model:UserPosts
+
     }]
   });
-  res.send(records);
+
 });
 
 app.listen(3012, (req, res) => {

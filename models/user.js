@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
         as:"UserDetails",
         onDelete: 'CASCADE' 
       })
+
+      User.hasMany(models.UserPost,{
+        foreignKey:"userId"
+      })
     }
   }
   User.init({
